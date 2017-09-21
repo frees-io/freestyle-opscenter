@@ -4,7 +4,7 @@ pgpSecretRing := file(s"$gpgFolder/secring.gpg")
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "freestyle-opscenter")
+  .settings(name := "frees-opscenter")
   .settings(moduleName := "root")
   .settings(noPublishSettings: _*)
   .settings(scalaMetaSettings: _*)
@@ -14,7 +14,7 @@ lazy val root = project
 
 lazy val core = crossProject
   .in(file("core"))
-  .settings(moduleName := "freestyle-opscenter")
+  .settings(moduleName := "frees-opscenter")
   .settings(scalaMetaSettings: _*)
   .crossDepSettings(commonDeps ++ freestyleCoreDeps(): _*)
   .jsSettings(sharedJsSettings: _*)
