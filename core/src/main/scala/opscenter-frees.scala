@@ -19,6 +19,9 @@ package opscenter
 
 import freestyle._
 import freestyle.config.ConfigM
+import freestyle.opscenter.model.Metric
+import org.http4s.HttpService
+import org.http4s.server.blaze.BlazeBuilder
 
 // Modules
 @module trait OpscenterApp {
@@ -30,14 +33,14 @@ import freestyle.config.ConfigM
 @module
 trait ServicesM {
   val config: ConfigM
-  val metrics: MetricsM
 }
 
 // Algebras
 @free trait ServerM {
-  def start: FS[String]
+  def getServer(host: String, port: Int, endpoints: HttpService): FS[BlazeBuilder]
+  def getEndpoints(metrics: List[Metric[Float]]): FS[HttpService]
 }
 
 @free trait MetricsM {
-  def readMetrics: FS[List[String]]
+  def readMetrics: FS[List[Metric[Float]]]
 }

@@ -24,23 +24,37 @@ import freestyle.config.implicits._
 import cats.implicits._
 import cats.syntax._
 import cats.~>
+import fs2.{Stream, Task}
+import org.http4s._
+import org.http4s.dsl._
+import org.http4s.HttpService
+import org.http4s.dsl.Root
+import org.http4s.server.blaze._
+import org.http4s.server.syntax._
+import org.http4s.util.StreamApp
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-object Main extends App {
+object Main extends StreamApp {
 
   def bootstrap[T[_]](
       implicit app: OpscenterApp[T],
-      handler: T ~> Future): FreeS[T, (String, Int)] = {
+      handler: T ~> Future): FreeS[T, BlazeBuilder] = {
+
     for {
       config <- app.services.config.load
       host = config.string("http.host").getOrElse("localhost")
       port = config.int("http.port").getOrElse(8080)
-    } yield (host, port)
+      metrics   <- app.metrics.readMetrics
+      endpoints <- app.server.getEndpoints(metrics)
+      server    <- app.server.getServer(host, port, endpoints)
+    } yield server
+
   }
 
-  println(Await.result(bootstrap[OpscenterApp.Op].interpret[Future], Duration.Inf))
+  override def stream(args: List[String]): Stream[Task, Nothing] =
+    Await.result(bootstrap[OpscenterApp.Op].interpret[Future], Duration.Inf).serve
 
 }

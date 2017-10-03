@@ -13,6 +13,8 @@ lazy val root = project
   .aggregate(core)
 
 val http4sVersion = "0.17.2"
+val freesVersion = "0.3.1"
+
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 lazy val core = project
@@ -24,7 +26,7 @@ lazy val core = project
     "org.http4s" %% "http4s-blaze-server" % http4sVersion,
     "org.http4s" %% "http4s-blaze-client" % http4sVersion,
     "org.http4s" %% "http4s-dsl" % http4sVersion,
-    "io.frees" %% "freestyle-http-http4s" % "0.3.1",
-    "io.frees" %% "freestyle-logging" % "0.3.1",
-    "io.frees" %% "freestyle-config" % "0.3.1"
+    "io.frees" %% "freestyle-http-http4s" % freesVersion,
+    "io.frees" %% "freestyle-logging" % freesVersion,
+    "io.frees" %% "freestyle-config" % freesVersion
   ))

@@ -19,29 +19,41 @@ package opscenter
 package runtime
 
 import freestyle.opscenter.model.Metric
-import fs2.util.{Attempt, Catchable, Suspendable}
+import org.http4s.{HttpService, _}
+import org.http4s.dsl._
+import org.http4s.dsl.Root
+import org.http4s.server.blaze._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.{Source => SourceIO}
-import scala.meta.Term.{Return, Throw}
 
 object implicits {
 
   implicit val metricsHandler: MetricsM.Handler[Future] = new MetricsM.Handler[Future] {
-    def readMetrics: Future[List[String]] = {
+    def readMetrics: Future[List[Metric[Float]]] = {
       val fileStream = getClass.getResourceAsStream("/metrics.txt")
       Future(SourceIO.fromInputStream(fileStream).getLines.toList.map(lineToTextMessage))
     }
 
-    private def lineToTextMessage(line: String): String = {
+    private def lineToTextMessage(line: String): Metric[Float] = {
       val columns = line.split(" ")
-      new Metric[Float](columns(0), columns(2), columns(3).toFloat, columns(1).toLong).toString()
+      new Metric[Float](columns(0), columns(2), columns(3).toFloat, columns(1).toLong)
     }
   }
 
   implicit val serverMHandler: ServerM.Handler[Future] = new ServerM.Handler[Future] {
-    def start: Future[String] = Future("Starting server ...")
+
+    def getServer(host: String, port: Int, endpoints: HttpService): Future[BlazeBuilder] =
+      Future(BlazeBuilder.bindHttp(port, host).mountService(endpoints, "/metrics"))
+
+    def getEndpoints(metrics: List[Metric[Float]]): Future[HttpService] =
+      Future(endpointsServices(metrics))
+
+    private def endpointsServices(metrics: List[Metric[Float]]): HttpService = HttpService {
+      case GET -> Root / "export"      => Ok(metrics.map(_.toString()) mkString "\n")
+      case GET -> Root / "healthcheck" => Ok(s"Works fine.")
+    }
   }
 
 }
