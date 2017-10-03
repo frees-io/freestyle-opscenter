@@ -10,3 +10,4 @@ The maintainers of the project are:
 
 These are the people that have contributed to the freestyle-opscenter project:
 
+* Ernesto Perinan Tocino <[eperinan](https://github.com/eperinan)>

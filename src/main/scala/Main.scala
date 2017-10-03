@@ -16,22 +16,31 @@
 
 package freestyle
 
-import cats.implicits._
-
+import freestyle.opscenter.runtime.implicits._
 import freestyle._
+import freestyle.opscenter._
 import freestyle.implicits._
+import freestyle.config.implicits._
+import cats.implicits._
+import cats.syntax._
+import cats.~>
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
-
-import freestyle.algebra._
-import freestyle.algebra.implicits._
+import scala.concurrent.duration.Duration
 
 object Main extends App {
 
-  def program[F[_]: AlgebraM]: FreeS[F, String] =
-    AlgebraM[F].hello
+  def bootstrap[T[_]](
+      implicit app: OpscenterApp[T],
+      handler: T ~> Future): FreeS[T, (String, Int)] = {
+    for {
+      config <- app.services.config.load
+      host = config.string("http.host").getOrElse("localhost")
+      port = config.int("http.port").getOrElse(8080)
+    } yield (host, port)
+  }
 
-  println(Await.result(program[AlgebraM.Op].interpret[Future], Duration.Inf))
+  println(Await.result(bootstrap[OpscenterApp.Op].interpret[Future], Duration.Inf))
+
 }

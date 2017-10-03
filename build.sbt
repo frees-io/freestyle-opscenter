@@ -4,21 +4,27 @@ pgpSecretRing := file(s"$gpgFolder/secring.gpg")
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "frees-opscenter")
+  .settings(name := "example")
   .settings(moduleName := "root")
   .settings(noPublishSettings: _*)
   .settings(scalaMetaSettings: _*)
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps())
-  .dependsOn(coreJVM)
-  .aggregate(coreJS, coreJVM)
+  .dependsOn(core)
+  .aggregate(core)
 
-lazy val core = crossProject
+val http4sVersion = "0.17.2"
+resolvers += Resolver.sonatypeRepo("snapshots")
+
+lazy val core = project
   .in(file("core"))
   .settings(moduleName := "frees-opscenter")
   .settings(scalaMetaSettings: _*)
-  .crossDepSettings(commonDeps ++ freestyleCoreDeps(): _*)
-  .jsSettings(sharedJsSettings: _*)
-
-
-lazy val coreJVM = core.jvm
-lazy val coreJS = core.js
+  .settings(parallelExecution in Test := false)
+  .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++ Seq(
+    "org.http4s" %% "http4s-blaze-server" % http4sVersion,
+    "org.http4s" %% "http4s-blaze-client" % http4sVersion,
+    "org.http4s" %% "http4s-dsl" % http4sVersion,
+    "io.frees" %% "freestyle-http-http4s" % "0.3.1",
+    "io.frees" %% "freestyle-logging" % "0.3.1",
+    "io.frees" %% "freestyle-config" % "0.3.1"
+  ))
