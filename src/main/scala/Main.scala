@@ -16,22 +16,34 @@
 
 package freestyle
 
-import cats.implicits._
-
+import freestyle.opscenter.runtime.implicits._
 import freestyle._
+import freestyle.opscenter._
 import freestyle.implicits._
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
+import freestyle.config.implicits._
+import cats.implicits._
+import fs2.{Stream, Task}
+import org.http4s.server.blaze._
+import org.http4s.util.StreamApp
 
-import freestyle.algebra._
-import freestyle.algebra.implicits._
+import scala.util.Try
 
-object Main extends App {
+object Main extends StreamApp {
 
-  def program[F[_]: AlgebraM]: FreeS[F, String] =
-    AlgebraM[F].hello
+  def bootstrap[T[_]](implicit app: OpscenterApp[T]): FreeS[T, BlazeBuilder] = {
 
-  println(Await.result(program[AlgebraM.Op].interpret[Future], Duration.Inf))
+    for {
+      config <- app.services.config.load
+      host = config.string("http.host").getOrElse("localhost")
+      port = config.int("http.port").getOrElse(8080)
+      metrics   <- app.metrics.readMetrics
+      endpoints <- app.server.getEndpoints(metrics)
+      server    <- app.server.getServer(host, port, endpoints)
+    } yield server
+
+  }
+
+  override def stream(args: List[String]): Stream[Task, Nothing] =
+    bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.fail(e), _.serve)
+
 }
