@@ -18,22 +18,23 @@ package freestyle
 package opscenter
 package runtime
 
+import cats.Applicative
 import freestyle.opscenter.model.Metric
 import org.http4s.{HttpService, _}
 import org.http4s.dsl._
 import org.http4s.dsl.Root
 import org.http4s.server.blaze._
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.{Source => SourceIO}
 
 object implicits {
 
-  implicit val metricsHandler: MetricsM.Handler[Future] = new MetricsM.Handler[Future] {
-    def readMetrics: Future[List[Metric[Float]]] = {
+  import cats.syntax.applicative._
+
+  implicit def metricsHandler[M[_]: Applicative]: MetricsM.Handler[M] = new MetricsM.Handler[M] {
+    def readMetrics: M[List[Metric[Float]]] = {
       val fileStream = getClass.getResourceAsStream("/metrics.txt")
-      Future(SourceIO.fromInputStream(fileStream).getLines.toList.map(lineToTextMessage))
+      SourceIO.fromInputStream(fileStream).getLines.toList.map(lineToTextMessage).pure[M]
     }
 
     private def lineToTextMessage(line: String): Metric[Float] = {
@@ -42,13 +43,13 @@ object implicits {
     }
   }
 
-  implicit val serverMHandler: ServerM.Handler[Future] = new ServerM.Handler[Future] {
+  implicit def serverMHandler[M[_]: Applicative]: ServerM.Handler[M] = new ServerM.Handler[M] {
 
-    def getServer(host: String, port: Int, endpoints: HttpService): Future[BlazeBuilder] =
-      Future(BlazeBuilder.bindHttp(port, host).mountService(endpoints, "/metrics"))
+    def getServer(host: String, port: Int, endpoints: HttpService): M[BlazeBuilder] =
+      BlazeBuilder.bindHttp(port, host).mountService(endpoints, "/metrics").pure[M]
 
-    def getEndpoints(metrics: List[Metric[Float]]): Future[HttpService] =
-      Future(endpointsServices(metrics))
+    def getEndpoints(metrics: List[Metric[Float]]): M[HttpService] =
+      endpointsServices(metrics).pure[M]
 
     private def endpointsServices(metrics: List[Metric[Float]]): HttpService = HttpService {
       case GET -> Root / "export"      => Ok(metrics.map(_.toString()) mkString "\n")

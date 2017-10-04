@@ -22,26 +22,15 @@ import freestyle.opscenter._
 import freestyle.implicits._
 import freestyle.config.implicits._
 import cats.implicits._
-import cats.syntax._
-import cats.~>
 import fs2.{Stream, Task}
-import org.http4s._
-import org.http4s.dsl._
-import org.http4s.HttpService
-import org.http4s.dsl.Root
 import org.http4s.server.blaze._
-import org.http4s.server.syntax._
 import org.http4s.util.StreamApp
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+
+import scala.util.Try
 
 object Main extends StreamApp {
 
-  def bootstrap[T[_]](
-      implicit app: OpscenterApp[T],
-      handler: T ~> Future): FreeS[T, BlazeBuilder] = {
+  def bootstrap[T[_]](implicit app: OpscenterApp[T]): FreeS[T, BlazeBuilder] = {
 
     for {
       config <- app.services.config.load
@@ -55,6 +44,6 @@ object Main extends StreamApp {
   }
 
   override def stream(args: List[String]): Stream[Task, Nothing] =
-    Await.result(bootstrap[OpscenterApp.Op].interpret[Future], Duration.Inf).serve
+    bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.fail(e), _.serve)
 
 }
