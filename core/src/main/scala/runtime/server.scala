@@ -16,8 +16,26 @@
 
 package freestyle
 package opscenter
-package model
+package runtime
+package server
 
-case class Metric[T](metric: String, microservice: String, node: String, value: T, date: Long) {
-  override def toString(): String = s"$microservice.$node $date $metric $value"
+import cats.Applicative
+import org.http4s.HttpService
+import org.http4s.server.blaze._
+
+object implicits {
+
+  import cats.syntax.applicative._
+
+  implicit def serverMHandler[M[_]: Applicative]: ServerM.Handler[M] = new ServerM.Handler[M] {
+
+    def getServer(host: String, port: Int, endpoints: HttpService): M[BlazeBuilder] =
+      BlazeBuilder
+        .bindHttp(port, host)
+        .withWebSockets(true)
+        .mountService(endpoints, "/")
+        .pure[M]
+
+  }
+
 }

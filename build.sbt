@@ -28,5 +28,6 @@ lazy val core = project
     "org.http4s" %% "http4s-dsl" % http4sVersion,
     "io.frees" %% "freestyle-http-http4s" % freesVersion,
     "io.frees" %% "freestyle-logging" % freesVersion,
-    "io.frees" %% "freestyle-config" % freesVersion
-  ))
+    "io.frees" %% "freestyle-config" % freesVersion,
+    "io.frees" %% "freestyle-fs2" % freesVersion excludeAll("co.fs2")
+))

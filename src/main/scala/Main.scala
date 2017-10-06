@@ -16,13 +16,17 @@
 
 package freestyle
 
-import freestyle.opscenter.runtime.implicits._
+import cats.Id
+import freestyle.opscenter.runtime.metrics.implicits._
+import freestyle.opscenter.runtime.server.implicits._
+import freestyle.opscenter.runtime.endpoints.implicits._
+
 import freestyle._
 import freestyle.opscenter._
 import freestyle.implicits._
 import freestyle.config.implicits._
 import cats.implicits._
-import fs2.{Stream, Task}
+import _root_.fs2.{Stream, Task}
 import org.http4s.server.blaze._
 import org.http4s.util.StreamApp
 
@@ -36,9 +40,7 @@ object Main extends StreamApp {
       config <- app.services.config.load
       host = config.string("http.host").getOrElse("localhost")
       port = config.int("http.port").getOrElse(8080)
-      metrics   <- app.metrics.readMetrics
-      endpoints <- app.server.getEndpoints(metrics)
-      server    <- app.server.getServer(host, port, endpoints)
+      server <- app.http.buildServer(host, port)
     } yield server
 
   }
