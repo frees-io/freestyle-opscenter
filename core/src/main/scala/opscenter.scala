@@ -19,28 +19,60 @@ package opscenter
 
 import freestyle._
 import freestyle.config.ConfigM
-import freestyle.opscenter.model.Metric
+import _root_.fs2.{Sink, Stream, Task}
 import org.http4s.HttpService
 import org.http4s.server.blaze.BlazeBuilder
+import cats.syntax.semigroup._
+import org.http4s.websocket.WebsocketBits.WebSocketFrame
 
 // Modules
 @module trait OpscenterApp {
-  val server: ServerM
-  val metrics: MetricsM
+  val http: HttpM
   val services: ServicesM
 }
 
-@module
-trait ServicesM {
+@module trait ServicesM {
   val config: ConfigM
+}
+
+@module trait HttpM {
+  val server: ServerM
+  val endpoints: EndpointsM
+  val metrics: MetricsM
+
+  def buildServer(host: String, port: Int): FS.Seq[BlazeBuilder] = {
+    for {
+      streamMetrics <- metrics.streamMetrics
+      fromClient    <- metrics.signalFromClient
+      endpoints     <- endpoints.build(streamMetrics, fromClient)
+      server        <- server.getServer(host, port, endpoints)
+    } yield server
+  }
 }
 
 // Algebras
 @free trait ServerM {
   def getServer(host: String, port: Int, endpoints: HttpService): FS[BlazeBuilder]
-  def getEndpoints(metrics: List[Metric[Float]]): FS[HttpService]
+}
+
+@free trait EndpointsM {
+  def healthcheck: FS[HttpService]
+
+  def websocketMetrics(
+      streamMetrics: Stream[Task, WebSocketFrame],
+      signalFromClient: Sink[Task, WebSocketFrame]): FS[HttpService]
+
+  def build(
+      streamMetrics: Stream[Task, WebSocketFrame],
+      fromClient: Sink[Task, WebSocketFrame]): FS.Seq[HttpService] = {
+    for {
+      healthEndpoint <- healthcheck
+      wsMetrics    <- websocketMetrics(streamMetrics, fromClient)
+    } yield healthEndpoint |+| wsMetrics
+  }
 }
 
 @free trait MetricsM {
-  def readMetrics: FS[List[Metric[Float]]]
+  def streamMetrics: FS[Stream[Task, WebSocketFrame]]
+  def signalFromClient: FS[Sink[Task, WebSocketFrame]]
 }
