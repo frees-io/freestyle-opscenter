@@ -46,7 +46,7 @@ object implicits {
           metricsStream: Stream[Task, WebSocketFrame],
           signalFromClient: Sink[Task, WebSocketFrame]): M[HttpService] =
         HttpService {
-          case GET -> Root / "export" => WS(metricsStream, signalFromClient)
+          case GET -> Root / "metrics" => WS(metricsStream, signalFromClient)
         }.pure[M]
 
     }
