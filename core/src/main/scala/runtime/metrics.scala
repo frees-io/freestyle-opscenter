@@ -45,7 +45,7 @@ object implicits {
   implicit def metricsHandler[M[_]: Applicative](implicit C: Capture[M]): MetricsM.Handler[M] =
     new MetricsM.Handler[M] {
 
-      private def randomMetrics: List[Metric[Int]] = {
+      private def randomMetrics: List[Metric] = {
         val microservices = List("analytics", "users", "payments")
         val nodes         = List("node-1", "node-2", "node-4")
         val metrics       = List("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
@@ -56,7 +56,7 @@ object implicits {
           metric       <- metrics
           value     = Random.nextInt()
           timestamp = Instant.now.getEpochSecond
-        } yield Metric[Int](metric, microservice, node, value, timestamp)
+        } yield Metric(metric, microservice, node, value.toFloat, timestamp)
 
       }
 
@@ -75,7 +75,7 @@ object implicits {
         val stream: Stream[Task, Text] = time
           .awakeEvery[Task](1.second)
           .map { d =>
-            Text(randomMetrics.map(_.toString()) mkString ("\n"))
+            Text(randomMetrics.flatten(_.toProto.toByteArray).toArray)
           }
         C.capture(stream)
       }

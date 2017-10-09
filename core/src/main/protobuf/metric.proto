@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+import "scalapb/scalapb.proto";
+
+package freestyle.opscenter.protobuf;
+
+message MetricProto {
+    option (scalapb.message).extends = "freestyle.opscenter.model.Proto";
+    required string metric = 1;
+    required string microservice = 2;
+    required string node = 3;
+    required float value = 4;
+    required int64 date = 5;
+}
