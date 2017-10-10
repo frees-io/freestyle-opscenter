@@ -22,33 +22,30 @@ package metrics
 import freestyle._
 import freestyle.implicits._
 import freestyle.fs2.implicits._
-import freestyle.opscenter.model.Metric
+import freestyle.opscenter.model.{ListMetrics, Metric}
 import freestyle.opscenter.runtime.metrics.implicits._
-import cats.implicits._
-import cats.Applicative
 import _root_.fs2.{time, Scheduler, Strategy, Stream, Task}
 import _root_.fs2._
-import org.http4s.websocket.WebsocketBits.Text
+import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
 import java.time.Instant
+
 import scala.concurrent.duration._
 import scala.util.Random
 
 object implicits {
 
-  import cats.syntax.applicative._
-
   implicit val scheduler = Scheduler.fromFixedDaemonPool(2)
   implicit val strategy =
     Strategy.fromExecutionContext(scala.concurrent.ExecutionContext.Implicits.global)
 
-  implicit def metricsHandler[M[_]: Applicative](implicit C: Capture[M]): MetricsM.Handler[M] =
+  implicit def metricsHandler[M[_]](implicit C: Capture[M]): MetricsM.Handler[M] =
     new MetricsM.Handler[M] {
 
-      private def randomMetrics: List[Metric] = {
-        val microservices = List("analytics", "users", "payments")
-        val nodes         = List("node-1", "node-2", "node-4")
-        val metrics       = List("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
+      private def randomMetrics: Seq[Metric] = {
+        val microservices = Seq("analytics", "users", "payments")
+        val nodes         = Seq("node-1", "node-2", "node-4")
+        val metrics       = Seq("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
 
         for {
           microservice <- microservices
@@ -72,10 +69,10 @@ object implicits {
       }
 
       def streamMetrics: M[Stream[Task, WebSocketFrame]] = {
-        val stream: Stream[Task, Text] = time
+        val stream: Stream[Task, Binary] = time
           .awakeEvery[Task](1.second)
           .map { d =>
-            Text(randomMetrics.flatten(_.toProto.toByteArray).toArray)
+            Binary(ListMetrics(randomMetrics.map(_.toProto)).toProto.toByteArray)
           }
         C.capture(stream)
       }

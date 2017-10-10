@@ -12,3 +12,7 @@ message MetricProto {
     required float value = 4;
     required int64 date = 5;
 }
+
+message ListMetricsProto {
+    repeated MetricProto listMetrics = 1;
+}
