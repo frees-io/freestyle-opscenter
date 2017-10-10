@@ -70,8 +70,8 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
     for {
       healthEndpoint <- healthcheck
       protoEndpoint  <- protoMetric
-      wsMetrics      <- websocketMetrics(streamMetrics, fromClient)
-    } yield healthEndpoint |+| wsMetrics |+| protoEndpoint
+      metricsWebsocket  <- websocketMetrics(streamMetrics, fromClient)
+    } yield healthEndpoint |+| metricsWebsocket |+| protoEndpoint
   }
 }
 
