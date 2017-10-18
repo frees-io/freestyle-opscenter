@@ -39,8 +39,8 @@ object implicits {
   implicit val strategy =
     Strategy.fromExecutionContext(scala.concurrent.ExecutionContext.Implicits.global)
 
-  implicit def metricsHandler[M[_]](implicit C: Capture[M]): MetricsM.Handler[M] =
-    new MetricsM.Handler[M] {
+  implicit def metricsHandler[M[_]](implicit C: Capture[M]): Metrics.Handler[M] =
+    new Metrics.Handler[M] {
 
       private def randomMetrics: List[Metric] = {
         val microservices = List("analytics", "users", "payments")
