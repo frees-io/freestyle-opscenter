@@ -27,7 +27,7 @@ object implicits {
 
   import cats.syntax.applicative._
 
-  implicit def serverMHandler[M[_]: Applicative]: ServerM.Handler[M] = new ServerM.Handler[M] {
+  implicit def serverMHandler[M[_]: Applicative]: Server.Handler[M] = new Server.Handler[M] {
 
     def getServer(host: String, port: Int, endpoints: HttpService): M[BlazeBuilder] =
       BlazeBuilder

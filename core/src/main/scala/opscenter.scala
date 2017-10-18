@@ -27,18 +27,18 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
 
 // Modules
 @module trait OpscenterApp {
-  val http: HttpM
-  val services: ServicesM
+  val http: Http
+  val services: Services
 }
 
-@module trait ServicesM {
+@module trait Services {
   val config: ConfigM
 }
 
-@module trait HttpM {
-  val server: ServerM
-  val endpoints: EndpointsM
-  val metrics: MetricsM
+@module trait Http {
+  val server: Server
+  val endpoints: Endpoints
+  val metrics: Metrics
 
   def buildServer(host: String, port: Int): FS.Seq[BlazeBuilder] = {
     for {
@@ -51,11 +51,11 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
 }
 
 // Algebras
-@free trait ServerM {
+@free trait Server {
   def getServer(host: String, port: Int, endpoints: HttpService): FS[BlazeBuilder]
 }
 
-@free trait EndpointsM {
+@free trait Endpoints {
   def healthcheck: FS[HttpService]
 
   def protoMetric: FS[HttpService]
@@ -75,7 +75,7 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
   }
 }
 
-@free trait MetricsM {
+@free trait Metrics {
   def streamMetrics: FS[Stream[Task, WebSocketFrame]]
   def signalFromClient: FS[Sink[Task, WebSocketFrame]]
 }

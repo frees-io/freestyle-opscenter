@@ -37,8 +37,8 @@ object implicits {
 
   import cats.syntax.applicative._
 
-  implicit def endpointsHandler[M[_]: Applicative]: EndpointsM.Handler[M] =
-    new EndpointsM.Handler[M] {
+  implicit def endpointsHandler[M[_]: Applicative]: Endpoints.Handler[M] =
+    new Endpoints.Handler[M] {
 
       def protoMetric: M[HttpService] =
         HttpService {
