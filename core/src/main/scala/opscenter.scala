@@ -58,6 +58,8 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
 @free trait EndpointsM {
   def healthcheck: FS[HttpService]
 
+  def protoMetric: FS[HttpService]
+
   def websocketMetrics(
       streamMetrics: Stream[Task, WebSocketFrame],
       signalFromClient: Sink[Task, WebSocketFrame]): FS[HttpService]
@@ -66,9 +68,10 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
       streamMetrics: Stream[Task, WebSocketFrame],
       fromClient: Sink[Task, WebSocketFrame]): FS.Seq[HttpService] = {
     for {
-      healthEndpoint <- healthcheck
-      wsMetrics    <- websocketMetrics(streamMetrics, fromClient)
-    } yield healthEndpoint |+| wsMetrics
+      healthEndpoint   <- healthcheck
+      protoEndpoint    <- protoMetric
+      metricsWebsocket <- websocketMetrics(streamMetrics, fromClient)
+    } yield healthEndpoint |+| metricsWebsocket |+| protoEndpoint
   }
 }
 

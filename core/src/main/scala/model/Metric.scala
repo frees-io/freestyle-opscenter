@@ -18,6 +18,46 @@ package freestyle
 package opscenter
 package model
 
-case class Metric[T](metric: String, microservice: String, node: String, value: T, date: Long) {
-  override def toString(): String = s"$microservice.$node $date $metric $value"
+import freestyle.opscenter.protobuf.metric.{MetricProto, MetricProtoList}
+
+case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long) {
+  def toProto: MetricProto = MetricProto(
+    metric = metric,
+    microservice = microservice,
+    node = node,
+    value = value,
+    date = date
+  )
+}
+
+object Metric {
+
+  def apply(proto: MetricProto): Metric = Metric(
+    metric = proto.metric,
+    microservice = proto.microservice,
+    node = proto.node,
+    value = proto.value,
+    date = proto.date
+  )
+
+  def apply(bytes: Array[Byte]): Metric =
+    Metric(MetricProto.parseFrom(bytes))
+
+}
+
+case class MetricsList(metricsList: List[MetricProto]) {
+  def toProto: MetricProtoList = MetricProtoList(
+    metricsList = metricsList
+  )
+}
+
+object MetricsList {
+
+  def apply(proto: MetricProtoList): MetricsList = MetricsList(
+    metricsList = proto.metricsList
+  )
+
+  def apply(bytes: Array[Byte]): MetricsList =
+    MetricsList(MetricProtoList.parseFrom(bytes))
+
 }

@@ -19,13 +19,16 @@ package opscenter
 package runtime
 package endpoints
 
+import java.io.File
+
 import freestyle._
 import freestyle.implicits._
 import freestyle.opscenter.runtime.metrics.implicits._
 import cats.Applicative
-import cats.implicits._
 import _root_.fs2._
-import org.http4s.{HttpService}
+import _root_.fs2.Task
+import _root_.fs2.interop.cats._
+import org.http4s.{HttpService, StaticFile}
 import org.http4s.server.websocket.WS
 import org.http4s.dsl.{->, /, GET, Ok, Root, _}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
@@ -37,6 +40,14 @@ object implicits {
   implicit def endpointsHandler[M[_]: Applicative]: EndpointsM.Handler[M] =
     new EndpointsM.Handler[M] {
 
+      def protoMetric: M[HttpService] =
+        HttpService {
+          case request @ GET -> Root / "proto" / "metric" =>
+            StaticFile
+              .fromFile(new File("core/src/main/protobuf/metric.proto"), Some(request))
+              .getOrElseF(NotFound())
+        }.pure[M]
+
       def healthcheck: M[HttpService] =
         HttpService {
           case GET -> Root / "healthcheck" => Ok(s"Works fine.")
@@ -46,7 +57,7 @@ object implicits {
           metricsStream: Stream[Task, WebSocketFrame],
           signalFromClient: Sink[Task, WebSocketFrame]): M[HttpService] =
         HttpService {
-          case GET -> Root / "export" => WS(metricsStream, signalFromClient)
+          case GET -> Root / "metrics" => WS(metricsStream, signalFromClient)
         }.pure[M]
 
     }
