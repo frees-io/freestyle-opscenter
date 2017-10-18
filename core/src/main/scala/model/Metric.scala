@@ -18,7 +18,7 @@ package freestyle
 package opscenter
 package model
 
-import freestyle.opscenter.protobuf.metric.{ListMetricsProto, MetricProto}
+import freestyle.opscenter.protobuf.metric.{MetricProto, MetricProtoList}
 
 case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long) {
   def toProto: MetricProto = MetricProto(
@@ -45,19 +45,19 @@ object Metric {
 
 }
 
-case class ListMetrics(listMetrics: Seq[MetricProto]) {
-  def toProto: ListMetricsProto = ListMetricsProto(
-    listMetrics = listMetrics
+case class MetricsList(metricsList: List[MetricProto]) {
+  def toProto: MetricProtoList = MetricProtoList(
+    metricsList = metricsList
   )
 }
 
-object ListMetrics {
+object MetricsList {
 
-  def apply(proto: ListMetricsProto): ListMetrics = ListMetrics(
-    listMetrics = proto.listMetrics
+  def apply(proto: MetricProtoList): MetricsList = MetricsList(
+    metricsList = proto.metricsList
   )
 
-  def apply(bytes: Array[Byte]): ListMetrics =
-    ListMetrics(ListMetricsProto.parseFrom(bytes))
+  def apply(bytes: Array[Byte]): MetricsList =
+    MetricsList(MetricProtoList.parseFrom(bytes))
 
 }

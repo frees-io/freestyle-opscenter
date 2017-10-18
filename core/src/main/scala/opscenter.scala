@@ -68,9 +68,9 @@ import org.http4s.websocket.WebsocketBits.WebSocketFrame
       streamMetrics: Stream[Task, WebSocketFrame],
       fromClient: Sink[Task, WebSocketFrame]): FS.Seq[HttpService] = {
     for {
-      healthEndpoint <- healthcheck
-      protoEndpoint  <- protoMetric
-      metricsWebsocket  <- websocketMetrics(streamMetrics, fromClient)
+      healthEndpoint   <- healthcheck
+      protoEndpoint    <- protoMetric
+      metricsWebsocket <- websocketMetrics(streamMetrics, fromClient)
     } yield healthEndpoint |+| metricsWebsocket |+| protoEndpoint
   }
 }

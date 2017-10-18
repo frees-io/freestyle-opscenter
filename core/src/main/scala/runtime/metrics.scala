@@ -22,7 +22,7 @@ package metrics
 import freestyle._
 import freestyle.implicits._
 import freestyle.fs2.implicits._
-import freestyle.opscenter.model.{ListMetrics, Metric}
+import freestyle.opscenter.model.{Metric, MetricsList}
 import freestyle.opscenter.runtime.metrics.implicits._
 import _root_.fs2.{time, Scheduler, Strategy, Stream, Task}
 import _root_.fs2._
@@ -42,10 +42,10 @@ object implicits {
   implicit def metricsHandler[M[_]](implicit C: Capture[M]): MetricsM.Handler[M] =
     new MetricsM.Handler[M] {
 
-      private def randomMetrics: Seq[Metric] = {
-        val microservices = Seq("analytics", "users", "payments")
-        val nodes         = Seq("node-1", "node-2", "node-4")
-        val metrics       = Seq("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
+      private def randomMetrics: List[Metric] = {
+        val microservices = List("analytics", "users", "payments")
+        val nodes         = List("node-1", "node-2", "node-4")
+        val metrics       = List("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
 
         for {
           microservice <- microservices
@@ -72,7 +72,7 @@ object implicits {
         val stream: Stream[Task, Binary] = time
           .awakeEvery[Task](1.second)
           .map { d =>
-            Binary(ListMetrics(randomMetrics.map(_.toProto)).toProto.toByteArray)
+            Binary(MetricsList(randomMetrics.map(_.toProto)).toProto.toByteArray)
           }
         C.capture(stream)
       }

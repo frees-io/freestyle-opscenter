@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 import "scalapb/scalapb.proto";
 
@@ -6,13 +6,13 @@ package freestyle.opscenter.protobuf;
 
 message MetricProto {
     option (scalapb.message).extends = "freestyle.opscenter.model.Proto";
-    required string metric = 1;
-    required string microservice = 2;
-    required string node = 3;
-    required float value = 4;
-    required int64 date = 5;
+    string metric = 1;
+    string microservice = 2;
+    string node = 3;
+    float value = 4;
+    int64 date = 5;
 }
 
-message ListMetricsProto {
-    repeated MetricProto listMetrics = 1;
+message MetricProtoList {
+    repeated MetricProto metricsList = 1 [(scalapb.field).collection_type="List"];
 }
