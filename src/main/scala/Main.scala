@@ -20,21 +20,22 @@ import cats.Id
 import freestyle.opscenter.runtime.metrics.implicits._
 import freestyle.opscenter.runtime.server.implicits._
 import freestyle.opscenter.runtime.endpoints.implicits._
-
 import freestyle._
 import freestyle.opscenter._
 import freestyle.implicits._
 import freestyle.config.implicits._
 import cats.implicits._
-import _root_.fs2.{Stream, Task}
+import _root_.fs2.Stream
+import cats.effect.{IO}
 import org.http4s.server.blaze._
 import org.http4s.util.StreamApp
+import org.http4s.util.StreamApp.ExitCode
 
 import scala.util.Try
 
-object Main extends StreamApp {
+object Main extends StreamApp[IO] {
 
-  def bootstrap[T[_]](implicit app: OpscenterApp[T]): FreeS[T, BlazeBuilder] = {
+  def bootstrap[T[_]](implicit app: OpscenterApp[T]): FreeS[T, BlazeBuilder[IO]] = {
 
     for {
       config <- app.services.config.load
@@ -45,7 +46,7 @@ object Main extends StreamApp {
 
   }
 
-  override def stream(args: List[String]): Stream[Task, Nothing] =
+  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
     bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.fail(e), _.serve)
 
 }

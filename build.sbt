@@ -3,19 +3,17 @@ pgpPublicRing := file(s"$gpgFolder/pubring.gpg")
 pgpSecretRing := file(s"$gpgFolder/secring.gpg")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
+
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 lazy val root = project
   .in(file("."))
   .settings(name := "example")
   .settings(moduleName := "root")
   .settings(noPublishSettings: _*)
-  .settings(scalaMetaSettings: _*)
-  .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps())
   .dependsOn(core)
   .aggregate(core)
-
-val http4sVersion = "0.17.2"
-val freesVersion = "0.3.1"
 
 lazy val core = project
   .in(file("core"))
@@ -32,13 +30,16 @@ lazy val core = project
     )
   )
   .settings(parallelExecution in Test := false)
-  .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++ Seq(
-    "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-    "org.http4s" %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s" %% "http4s-dsl" % http4sVersion,
-    "io.frees" %% "freestyle-http-http4s" % freesVersion,
-    "io.frees" %% "freestyle-logging" % freesVersion,
-    "io.frees" %% "freestyle-config" % freesVersion,
-    "io.frees" %% "freestyle-fs2" % freesVersion excludeAll ("co.fs2")
-  ))
+  .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
+    Seq(
+      %%("frees-core"),
+      %%("frees-http-http4s"),
+      %%("frees-config"),
+      %%("frees-logging"),
+      %%("cats-effect"),
+      %%("http4s-dsl"),
+      %%("http4s-blaze-client"),
+      %%("http4s-blaze-server")
+    )
+  )
 
