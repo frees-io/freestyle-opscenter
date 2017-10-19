@@ -22,6 +22,7 @@ package server
 import cats.Applicative
 import org.http4s.HttpService
 import org.http4s.server.blaze._
+import cats.effect.IO
 
 object implicits {
 
@@ -29,8 +30,8 @@ object implicits {
 
   implicit def serverMHandler[M[_]: Applicative]: Server.Handler[M] = new Server.Handler[M] {
 
-    def getServer(host: String, port: Int, endpoints: HttpService): M[BlazeBuilder] =
-      BlazeBuilder
+    def getServer(host: String, port: Int, endpoints: HttpService[IO]): M[BlazeBuilder[IO]] =
+      BlazeBuilder[IO]
         .bindHttp(port, host)
         .withWebSockets(true)
         .mountService(endpoints, "/")

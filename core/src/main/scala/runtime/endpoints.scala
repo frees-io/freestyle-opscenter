@@ -26,12 +26,12 @@ import freestyle.implicits._
 import freestyle.opscenter.runtime.metrics.implicits._
 import cats.Applicative
 import _root_.fs2._
-import _root_.fs2.Task
-import _root_.fs2.interop.cats._
+import cats.effect.IO
+import org.http4s.dsl.impl.Root
 import org.http4s.{HttpService, StaticFile}
 import org.http4s.server.websocket.WS
-import org.http4s.dsl.{->, /, GET, Ok, Root, _}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
+import org.http4s.dsl.io._
 
 object implicits {
 
@@ -40,23 +40,23 @@ object implicits {
   implicit def endpointsHandler[M[_]: Applicative]: Endpoints.Handler[M] =
     new Endpoints.Handler[M] {
 
-      def protoMetric: M[HttpService] =
-        HttpService {
+      def protoMetric: M[HttpService[IO]] =
+        HttpService[IO] {
           case request @ GET -> Root / "proto" / "metric" =>
             StaticFile
               .fromFile(new File("core/src/main/protobuf/metric.proto"), Some(request))
               .getOrElseF(NotFound())
         }.pure[M]
 
-      def healthcheck: M[HttpService] =
-        HttpService {
+      def healthcheck: M[HttpService[IO]] =
+        HttpService[IO] {
           case GET -> Root / "healthcheck" => Ok(s"Works fine.")
         }.pure[M]
 
       def websocketMetrics(
-          metricsStream: Stream[Task, WebSocketFrame],
-          signalFromClient: Sink[Task, WebSocketFrame]): M[HttpService] =
-        HttpService {
+          metricsStream: Stream[IO, WebSocketFrame],
+          signalFromClient: Sink[IO, WebSocketFrame]): M[HttpService[IO]] =
+        HttpService[IO] {
           case GET -> Root / "metrics" => WS(metricsStream, signalFromClient)
         }.pure[M]
 
