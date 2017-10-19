@@ -16,8 +16,11 @@
 
 package freestyle
 package opscenter
-package model
 
-trait Proto {
-  def toByteArray: Array[Byte]
+object Models {
+
+  type Metrics = List[Metric]
+
+  case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)
+  case class MetricsList(metrics: Metrics)
 }

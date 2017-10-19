@@ -16,6 +16,11 @@
 
 package freestyle
 
+import java.util.Optional
+
+import freestyle.opscenter.Models.{Metric, Metrics}
+import org.http4s.websocket.WebsocketBits.Binary
+
 import cats.Id
 import freestyle.opscenter.runtime.metrics.implicits._
 import freestyle.opscenter.runtime.server.implicits._

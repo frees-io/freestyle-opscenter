@@ -1,36 +1,27 @@
-import sbtorgpolicies.OrgPoliciesPlugin.autoImport.%%
-
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
 pgpPublicRing := file(s"$gpgFolder/pubring.gpg")
 pgpSecretRing := file(s"$gpgFolder/secring.gpg")
 
-resolvers += Resolver.sonatypeRepo("snapshots")
-resolvers += Resolver.sonatypeRepo("releases")
-
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
+)
 
 lazy val root = project
   .in(file("."))
+  .settings(scalaVersion := "2.12.3")
   .settings(name := "example")
   .settings(moduleName := "root")
   .settings(noPublishSettings: _*)
+  .settings(scalaMetaSettings: _*)
   .dependsOn(core)
   .aggregate(core)
 
 lazy val core = project
   .in(file("core"))
+  .settings(scalaVersion := "2.12.3")
   .settings(moduleName := "frees-opscenter")
   .settings(scalaMetaSettings: _*)
-  .settings(
-    PB.targets in Compile := Seq(
-      scalapb.gen() -> (sourceManaged in Compile).value
-    ),
-    PB.protoSources in Compile := Seq(file("core/src/main/protobuf")),
-    libraryDependencies ++= Seq(
-      "com.trueaccord.scalapb" %%% "scalapb-runtime" % com.trueaccord.scalapb.compiler.Version.scalapbVersion,
-      "com.trueaccord.scalapb" %%% "scalapb-runtime" % com.trueaccord.scalapb.compiler.Version.scalapbVersion % "protobuf"
-    )
-  )
   .settings(parallelExecution in Test := false)
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
     Seq(
@@ -41,7 +32,7 @@ lazy val core = project
       %%("cats-effect"),
       %%("http4s-dsl"),
       %%("http4s-blaze-client"),
-      %%("http4s-blaze-server")
+      %%("http4s-blaze-server"),
+      %%("pbdirect")
     )
   )
-
