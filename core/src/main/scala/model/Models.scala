@@ -19,13 +19,19 @@ package opscenter
 
 import freestyle._
 import freestyle.rpc.protocol._
+import org.joda.time.DateTime
 
 object Models {
 
   type Metrics = List[Metric]
 
   @message
-  case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)
+  case class Metric(
+      metric: String,
+      microservice: String,
+      node: String,
+      value: Float,
+      date: DateTime)
 
   @message
   case class MetricsList(metrics: Metrics)

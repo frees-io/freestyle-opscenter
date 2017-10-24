@@ -26,13 +26,23 @@ import freestyle.opscenter.Models.{Metric, Metrics, MetricsList}
 import _root_.fs2._
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
-import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import cats.effect.IO
+import com.google.protobuf.{CodedInputStream, CodedOutputStream}
 import scala.concurrent.duration._
 import scala.util.Random
+import org.joda.time.DateTime
 
 object implicits {
+
+  implicit object JodaDateTimeWriter extends PBWriter[DateTime] {
+    implicit def writeTo(index: Int, value: DateTime, out: CodedOutputStream): Unit =
+      out.writeInt64(index, value.getMillis)
+  }
+
+  implicit object JodaDateTimeExtractor extends PBExtractor[DateTime] {
+    override def extract(input: CodedInputStream): DateTime = new DateTime(input.readInt64())
+  }
 
   implicit def metricsHandler[M[_]](implicit C: Capture[M]): Metrics.Handler[M] =
     new Metrics.Handler[M] {
@@ -47,7 +57,7 @@ object implicits {
           node         <- nodes
           metric       <- metrics
           value     = Random.nextInt()
-          timestamp = Instant.now.getEpochSecond
+          timestamp = DateTime.now()
         } yield Metric(metric, microservice, node, value.toFloat, timestamp)
 
       }
