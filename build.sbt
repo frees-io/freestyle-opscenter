@@ -9,9 +9,9 @@ resolvers ++= Seq(
 
 lazy val root = project
   .in(file("."))
-  .settings(scalaVersion := "2.12.3")
   .settings(name := "example")
   .settings(moduleName := "root")
+  .settings(scalaVersion := "2.12.3")
   .settings(noPublishSettings: _*)
   .settings(scalaMetaSettings: _*)
   .dependsOn(core)
@@ -19,16 +19,17 @@ lazy val root = project
 
 lazy val core = project
   .in(file("core"))
-  .settings(scalaVersion := "2.12.3")
   .settings(moduleName := "frees-opscenter")
   .settings(scalaMetaSettings: _*)
   .settings(parallelExecution in Test := false)
+  .settings(scalaVersion := "2.12.3")
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
     Seq(
       %%("frees-core"),
       %%("frees-http-http4s"),
       %%("frees-config"),
       %%("frees-logging"),
+      %%("frees-rpc"),
       %%("cats-effect"),
       %%("http4s-dsl"),
       %%("http4s-blaze-client"),
