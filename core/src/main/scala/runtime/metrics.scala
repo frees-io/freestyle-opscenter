@@ -19,19 +19,16 @@ package opscenter
 package runtime
 package metrics
 
-import freestyle._
-import freestyle.implicits._
-import freestyle.opscenter.model.{Metric, MetricsList}
-import freestyle.opscenter.runtime.metrics.implicits._
+import pbdirect._
+import cats.instances.list._
 import _root_.fs2.{Scheduler, Stream}
+import freestyle.opscenter.Models.{Metric, Metrics, MetricsList}
 import _root_.fs2._
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import cats.effect.IO
-
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -40,7 +37,7 @@ object implicits {
   implicit def metricsHandler[M[_]](implicit C: Capture[M]): Metrics.Handler[M] =
     new Metrics.Handler[M] {
 
-      private def randomMetrics: List[Metric] = {
+      private def randomMetrics: Metrics = {
         val microservices = List("analytics", "users", "payments")
         val nodes         = List("node-1", "node-2", "node-4")
         val metrics       = List("cassandra.queue", "instance.cpu.usage", "instance.cpu.disk")
@@ -56,7 +53,6 @@ object implicits {
       }
 
       def signalFromClient: M[Sink[IO, WebSocketFrame]] = {
-
         val fromClient: Sink[IO, WebSocketFrame] = _.evalMap { (ws: WebSocketFrame) =>
           ws match {
             case Text(t, _) => IO.apply(println(s"Received from client: $t"))
@@ -70,7 +66,7 @@ object implicits {
         val stream: Stream[IO, Binary] = Scheduler[IO](2)
           .flatMap(_.awakeEvery[IO](1.second))
           .map { d =>
-            Binary(MetricsList(randomMetrics.map(_.toProto)).toProto.toByteArray)
+            Binary(MetricsList(randomMetrics).toPB)
           }
         C.capture(stream)
       }

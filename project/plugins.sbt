@@ -1,1 +1,3 @@
-addSbtPlugin("io.frees" % "sbt-freestyle" % "0.3.2")
+resolvers += Resolver.sonatypeRepo("releases")
+
+addSbtPlugin("io.frees" % "sbt-freestyle" % "0.3.6")

@@ -16,8 +16,17 @@
 
 package freestyle
 package opscenter
-package model
 
-trait Proto {
-  def toByteArray: Array[Byte]
+import freestyle._
+import freestyle.rpc.protocol._
+
+object Models {
+
+  type Metrics = List[Metric]
+
+  @message
+  case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)
+
+  @message
+  case class MetricsList(metrics: Metrics)
 }
