@@ -26,7 +26,6 @@ import freestyle.opscenter.Models.{Metric, Metrics, MetricsList}
 import _root_.fs2._
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
-import shapeless.Lazy
 import scala.concurrent.ExecutionContext.Implicits.global
 import cats.effect.IO
 import com.google.protobuf.{CodedInputStream, CodedOutputStream}
