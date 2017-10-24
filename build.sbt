@@ -34,6 +34,7 @@ lazy val core = project
       %%("http4s-dsl"),
       %%("http4s-blaze-client"),
       %%("http4s-blaze-server"),
-      %%("pbdirect")
+      %%("pbdirect"),
+      %("joda-time")
     )
   )
