@@ -19,19 +19,20 @@ package handlers
 
 import cats.~>
 import freestyle.Capture
-import freestyle.opscenter.protocols.{Feature, OpscenterService}
+import freestyle.opscenter.protocols._
 import journal.Logger
 import monix.eval.Task
+import monix.reactive.Observable
 
 class OpscenterServiceHandler[F[_]](implicit C: Capture[F], T2F: Task ~> F)
     extends OpscenterService.Handler[F] {
 
   val logger: Logger = Logger[this.type]
 
-  override protected[this] def getFeature(point: String): F[Feature] =
-    C.capture {
-      logger.info(s"Fetching feature at  ...")
-      Feature("a", "b")
-    }
+  override protected[this] def getBook(book: GetBookRequest): F[Observable[Book]] =
+    C.capture(Observable(Book(123, "b", "aa")))
+
+  override protected[this] def queryBooks(query: QueryBooksRequest): F[Observable[Book]] =
+    C.capture(Observable(Book(123, "b", "aa")))
 
 }

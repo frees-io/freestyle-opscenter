@@ -18,7 +18,7 @@ package freestyle
 package opscenter
 
 import freestyle._
-import freestyle.rpc.protocol._
+import freestyle.rpc.protocol.{rpc, stream, _}
 import monix.reactive.Observable
 
 @option(name = "java_package", value = "routeguide", quote = true)
@@ -27,13 +27,26 @@ import monix.reactive.Observable
 object protocols {
 
   @message
-  case class Feature(name: String, location: String)
+  case class Book(isbn: Int, title: String, author: String)
+
+  @message
+  case class GetBookRequest(isbn: Int)
+  @message
+  case class QueryBooksRequest(author_prefix: String)
 
   @free
   @service
   @debug
   trait OpscenterService {
-    @rpc def getFeature(point: String): FS[Feature]
+
+    @rpc
+    @stream[ResponseStreaming.type]
+    def getBook(book: GetBookRequest): FS[Observable[Book]]
+
+    @rpc
+    @stream[ResponseStreaming.type]
+    def queryBooks(query: QueryBooksRequest): FS[Observable[Book]]
+
   }
 
 }
