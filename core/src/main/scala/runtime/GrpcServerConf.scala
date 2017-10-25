@@ -17,26 +17,23 @@
 package freestyle
 package opscenter
 package runtime
-package server
 
-import cats.Applicative
-import org.http4s.HttpService
-import org.http4s.server.blaze._
-import cats.effect.IO
+import cats.implicits._
+import freestyle.implicits._
+import freestyle.config.implicits._
+import freestyle.rpc.server._
 
-object implicits {
+import scala.util.{Failure, Success, Try}
 
-  import cats.syntax.applicative._
+trait GrpcServerConf {
 
-  implicit def serverMHandler[M[_]: Applicative]: Server.Handler[M] = new Server.Handler[M] {
-
-    def getServer(host: String, port: Int, endpoints: HttpService[IO]): M[BlazeBuilder[IO]] =
-      BlazeBuilder[IO]
-        .bindHttp(port, host)
-        .withWebSockets(true)
-        .mountService(endpoints, "/")
-        .pure[M]
-
-  }
+  def getConf(grpcConfigs: List[GrpcConfig]): ServerW =
+    BuildServerFromConfig[ServerConfig.Op]("rpc.server.port", grpcConfigs)
+      .interpret[Try] match {
+      case Success(c) => c
+      case Failure(e) =>
+        e.printStackTrace()
+        throw new RuntimeException("Unable to load the server configuration", e)
+    }
 
 }

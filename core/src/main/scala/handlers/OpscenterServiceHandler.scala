@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package freestyle
+package routeguide
+package handlers
 
-import cats.implicits._
-import freestyle.rpc.server.GrpcServerApp
-import freestyle.rpc.server.implicits._
+import cats.~>
+import freestyle.Capture
+import freestyle.opscenter.protocols.{Feature, OpscenterService}
 import journal.Logger
-import freestyle.opscenter.runtime.server.implicits._
+import monix.eval.Task
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
-object ServerApp {
+class OpscenterServiceHandler[F[_]](implicit C: Capture[F], T2F: Task ~> F)
+    extends OpscenterService.Handler[F] {
 
   val logger: Logger = Logger[this.type]
 
-  def main(args: Array[String]): Unit = {
-
-    logger.info(s"Server is starting ...")
-
-    Await.result(server[GrpcServerApp.Op].bootstrapFuture, Duration.Inf)
-  }
+  override protected[this] def getFeature(point: String): F[Feature] =
+    C.capture {
+      logger.info(s"Fetching feature at  ...")
+      Feature("a", "b")
+    }
 
 }

@@ -15,25 +15,25 @@
  */
 
 package freestyle
+package opscenter
 
-import cats.implicits._
-import freestyle.rpc.server.GrpcServerApp
-import freestyle.rpc.server.implicits._
-import journal.Logger
-import freestyle.opscenter.runtime.server.implicits._
+import freestyle._
+import freestyle.rpc.protocol._
+import monix.reactive.Observable
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+@option(name = "java_package", value = "routeguide", quote = true)
+@option(name = "java_multiple_files", value = "true", quote = false)
+@option(name = "java_outer_classname", value = "RouteGuide", quote = true)
+object protocols {
 
-object ServerApp {
+  @message
+  case class Feature(name: String, location: String)
 
-  val logger: Logger = Logger[this.type]
-
-  def main(args: Array[String]): Unit = {
-
-    logger.info(s"Server is starting ...")
-
-    Await.result(server[GrpcServerApp.Op].bootstrapFuture, Duration.Inf)
+  @free
+  @service
+  @debug
+  trait OpscenterService {
+    @rpc def getFeature(point: String): FS[Feature]
   }
 
 }
