@@ -23,16 +23,18 @@ import org.joda.time.DateTime
 
 object Models {
 
-  type Metrics = List[Metric]
+  @message
+  case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)
+
+  object Metric {
+
+    object implicits {
+      implicit def fromLongToDateTime(l: Long): DateTime = new DateTime(l)
+      implicit def fromDateTimeToLong(d: DateTime): Long     = d.getMillis
+    }
+
+  }
 
   @message
-  case class Metric(
-      metric: String,
-      microservice: String,
-      node: String,
-      value: Float,
-      date: DateTime)
-
-  @message
-  case class MetricsList(metrics: Metrics)
+  case class MetricsList(metrics: List[Metric])
 }
