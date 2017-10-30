@@ -42,9 +42,9 @@ object implicits {
 
       def protoMetric: M[HttpService[IO]] =
         HttpService[IO] {
-          case request @ GET -> Root / "proto" / "metric" =>
+          case request @ GET -> Root / "proto" / "models" =>
             StaticFile
-              .fromFile(new File("core/src/main/protobuf/metric.proto"), Some(request))
+              .fromFile(new File("core/src/main/proto/Models.proto"), Some(request))
               .getOrElseF(NotFound())
         }.pure[M]
 

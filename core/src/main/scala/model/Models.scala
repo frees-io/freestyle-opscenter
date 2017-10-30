@@ -30,7 +30,7 @@ object Models {
 
     object implicits {
       implicit def fromLongToDateTime(l: Long): DateTime = new DateTime(l)
-      implicit def fromDateTimeToLong(d: DateTime): Long     = d.getMillis
+      implicit def fromDateTimeToLong(d: DateTime): Long = d.getMillis
     }
 
   }
