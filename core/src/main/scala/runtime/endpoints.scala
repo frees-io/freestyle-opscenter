@@ -29,8 +29,8 @@ import org.http4s.server.websocket.WS
 import org.http4s.dsl.io._
 import pbdirect._
 import _root_.fs2.{Scheduler, Stream}
-import freestyle.opscenter.Models.{Metric, MetricsList}
-import freestyle.opscenter.Models.Metric.implicits._
+import freestyle.metrics.Models.{Metric, MetricsList}
+import freestyle.metrics.Models.Metric.implicits._
 import _root_.fs2._
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
@@ -49,7 +49,7 @@ object implicits {
         C.capture(HttpService[IO] {
           case request @ GET -> Root / "proto" / "models" =>
             StaticFile
-              .fromFile(new File("core/src/main/proto/Models.proto"), Some(request))
+              .fromFile(new File("metrics/src/main/proto/Models.proto"), Some(request))
               .getOrElseF(NotFound())
         })
 

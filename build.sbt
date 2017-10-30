@@ -38,3 +38,19 @@ lazy val core = project
       %("joda-time")
     )
   )
+  .dependsOn(metrics)
+  .aggregate(metrics)
+
+lazy val metrics = project
+  .in(file("metrics"))
+  .settings(moduleName := "frees-metrics")
+  .settings(scalaVersion := "2.12.3")
+  .settings(noPublishSettings: _*)
+  .settings(scalaMetaSettings: _*)
+  .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
+    Seq(
+      %%("frees-core"),
+      %%("frees-rpc"),
+      %("joda-time")
+    )
+  )

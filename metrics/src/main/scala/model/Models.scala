@@ -15,7 +15,7 @@
  */
 
 package freestyle
-package opscenter
+package metrics
 
 import freestyle._
 import freestyle.rpc.protocol._
