@@ -39,9 +39,11 @@ object Main extends StreamApp[IO] {
 
     for {
       config <- app.services.config.load
-      host = config.string("http.host").getOrElse("localhost")
-      port = config.int("http.port").getOrElse(8080)
-      server <- app.http.buildServer(host, port)
+      host         = config.string("http.host").getOrElse("localhost")
+      port         = config.int("http.port").getOrElse(8080)
+      microservice = config.string("microservice.name").getOrElse("opscenter")
+      node         = config.string("microservice.node").getOrElse("node1")
+      server <- app.http.buildServer(host, port, microservice, node)
     } yield server
 
   }

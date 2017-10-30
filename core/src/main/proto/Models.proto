@@ -16,6 +16,15 @@ message Metric {
 message MetricsList {
    repeated Metric metrics = 1;
 }
+           
+message Microservice {
+   string name = 1;
+   string node = 2;
+}
+           
+message MicroserviceList {
+   repeated Microservice microservices = 1;
+}
 
 
            

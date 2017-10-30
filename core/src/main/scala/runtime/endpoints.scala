@@ -20,7 +20,7 @@ package runtime
 package endpoints
 
 import java.io.File
-
+import pbdirect._
 import freestyle._
 import freestyle.implicits._
 import freestyle.opscenter.runtime.metrics.implicits._
@@ -32,6 +32,7 @@ import org.http4s.{HttpService, StaticFile}
 import org.http4s.server.websocket.WS
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
 import org.http4s.dsl.io._
+import freestyle.opscenter.services.microservices._
 
 object implicits {
 
@@ -42,15 +43,20 @@ object implicits {
 
       def protoMetric: M[HttpService[IO]] =
         HttpService[IO] {
-          case request @ GET -> Root / "proto" / "metric" =>
+          case request @ GET -> Root / "proto" / "models" =>
             StaticFile
-              .fromFile(new File("core/src/main/protobuf/metric.proto"), Some(request))
+              .fromFile(new File("core/src/main/proto/Models.proto"), Some(request))
               .getOrElseF(NotFound())
         }.pure[M]
 
       def healthcheck: M[HttpService[IO]] =
         HttpService[IO] {
           case GET -> Root / "healthcheck" => Ok(s"Works fine.")
+        }.pure[M]
+
+      def microservices(microservice: String, node: String): M[HttpService[IO]] =
+        HttpService[IO] {
+          case GET -> Root / "microservices" => Ok(getMicroservices(microservice, node).toPB)
         }.pure[M]
 
       def websocketMetrics(
