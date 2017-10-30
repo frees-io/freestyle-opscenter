@@ -48,14 +48,11 @@ import org.http4s.dsl.io._
 @module trait Http {
   val server: Server
   val endpoints: Endpoints
-  val metrics: Metrics
 
   def buildServer(host: String, port: Int): FS.Seq[BlazeBuilder[IO]] = {
     for {
-      streamMetrics <- metrics.streamMetrics
-      fromClient    <- metrics.signalFromClient
-      endpoints     <- endpoints.build(streamMetrics, fromClient)
-      server        <- server.getServer(host, port, endpoints)
+      endpoints <- endpoints.build
+      server    <- server.getServer(host, port, endpoints)
     } yield server
   }
 }
@@ -68,19 +65,9 @@ import org.http4s.dsl.io._
 @free trait Endpoints {
   def healthcheck: FS[HttpService[IO]]
 
-  def protoMetric: FS[HttpService[IO]]
+  def protoModels: FS[HttpService[IO]]
 
-  def websocketMetrics(
-      streamMetrics: Stream[IO, WebSocketFrame],
-      signalFromClient: Sink[IO, WebSocketFrame]): FS[HttpService[IO]]
+  def streamMetrics: FS[HttpService[IO]]
 
-  def build(
-      streamMetrics: Stream[IO, WebSocketFrame],
-      fromClient: Sink[IO, WebSocketFrame]): FS.Seq[HttpService[IO]] =
-    (healthcheck, protoMetric, websocketMetrics(streamMetrics, fromClient)).mapN(_ <+> _ <+> _)
-}
-
-@free trait Metrics {
-  def streamMetrics: FS[Stream[IO, WebSocketFrame]]
-  def signalFromClient: FS[Sink[IO, WebSocketFrame]]
+  def build: FS.Seq[HttpService[IO]] = (healthcheck, protoModels, streamMetrics).mapN(_ <+> _ <+> _)
 }

@@ -17,7 +17,6 @@
 package freestyle
 
 import cats.Id
-import freestyle.opscenter.runtime.metrics.implicits._
 import freestyle.opscenter.runtime.server.implicits._
 import freestyle.opscenter.runtime.endpoints.implicits._
 import freestyle._
