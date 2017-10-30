@@ -1,0 +1,21 @@
+// This file has been automatically generated for use by
+// sbt-frees-protogen plugin, from freestyle-rpc service definitions
+
+syntax = "proto3";
+
+
+
+message Metric {
+   string metric = 1;
+   string microservice = 2;
+   string node = 3;
+   float value = 4;
+   int64 date = 5;
+}
+           
+message MetricsList {
+   repeated Metric metrics = 1;
+}
+
+
+           

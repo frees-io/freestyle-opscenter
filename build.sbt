@@ -26,7 +26,7 @@ lazy val core = project
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
     Seq(
       %%("frees-core"),
-      %%("frees-http-http4s"),
+      %%("frees-http4s"),
       %%("frees-config"),
       %%("frees-logging"),
       %%("frees-rpc"),

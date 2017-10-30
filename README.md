@@ -2,6 +2,13 @@
 
 Opscenter
 
+## Generating the proto file
+   
+`sbt core/protoGen`
+
+The previous command will overwrite this proto file.
+
+
 [comment]: # (Start Copyright)
 # Copyright
 
