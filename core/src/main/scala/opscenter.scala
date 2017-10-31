@@ -19,20 +19,24 @@ package opscenter
 
 import freestyle._
 import freestyle.config.ConfigM
+import freestyle.logging._
 import org.http4s.implicits._
 import org.http4s.HttpService
 import org.http4s.server.blaze.BlazeBuilder
 import cats.effect.IO
 import cats.implicits._
+import freestyle.metrics.Metrics
 
 // Modules
 @module trait OpscenterApp {
   val http: Http
   val services: Services
+  val metrics: Metrics
 }
 
 @module trait Services {
   val config: ConfigM
+  val log: LoggingM
 }
 
 @module trait Http {
