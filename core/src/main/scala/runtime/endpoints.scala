@@ -45,11 +45,19 @@ object implicits {
   implicit def endpointsHandler[M[_]](implicit C: Capture[M]): Endpoints.Handler[M] =
     new Endpoints.Handler[M] {
 
-      def protoModels: M[HttpService[IO]] =
+      def protoMetricModels: M[HttpService[IO]] =
         C.capture(HttpService[IO] {
-          case request @ GET -> Root / "proto" / "models" =>
+          case request @ GET -> Root / "proto" / "models" / "metrics" =>
             StaticFile
-              .fromFile(new File("metrics/src/main/proto/Models.proto"), Some(request))
+              .fromFile(new File("metrics/src/main/proto/models.proto"), Some(request))
+              .getOrElseF(NotFound())
+        })
+
+      def protoMicroservicesModels: M[HttpService[IO]] =
+        C.capture(HttpService[IO] {
+          case request @ GET -> Root / "proto" / "models" / "microservices" =>
+            StaticFile
+              .fromFile(new File("core/src/main/proto/models.proto"), Some(request))
               .getOrElseF(NotFound())
         })
 

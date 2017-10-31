@@ -58,12 +58,14 @@ import freestyle.metrics.Metrics
 
 @free trait Endpoints {
 
-  def protoModels: FS[HttpService[IO]]
+  def protoMetricModels: FS[HttpService[IO]]
+  def protoMicroservicesModels: FS[HttpService[IO]]
   def microservices: FS[HttpService[IO]]
   def healthcheck: FS[HttpService[IO]]
   def streamMetrics: FS[HttpService[IO]]
 
   def build: FS.Seq[HttpService[IO]] =
-    (healthcheck, protoModels, streamMetrics, microservices).mapN(_ <+> _ <+> _ <+> _)
+    (healthcheck, protoMetricModels, protoMicroservicesModels, streamMetrics, microservices).mapN(
+      _ <+> _ <+> _ <+> _ <+> _)
 
 }
