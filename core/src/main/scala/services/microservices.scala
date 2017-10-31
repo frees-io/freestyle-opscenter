@@ -22,13 +22,11 @@ import freestyle.opscenter.models.{Microservice, MicroserviceList}
 
 object microservices {
 
-  def getMicroservices(microservice: String, node: String): MicroserviceList = {
-
-    val opscenter = Microservice(microservice, node)
+  def getMicroservices: MicroserviceList = {
 
     // TODO: Pending to implement with freestyle-cassandra
-    val microservicesCassandra = Nil
+    val microservices = Microservice("microservice-0", "node1")
 
-    MicroserviceList(opscenter :: microservicesCassandra)
+    MicroserviceList(microservices :: Nil)
   }
 }

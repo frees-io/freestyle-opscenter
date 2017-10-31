@@ -50,15 +50,11 @@ import org.http4s.dsl.io._
   val endpoints: Endpoints
   val metrics: Metrics
 
-  def buildServer(
-      host: String,
-      port: Int,
-      microservice: String,
-      node: String): FS.Seq[BlazeBuilder[IO]] = {
+  def buildServer(host: String, port: Int): FS.Seq[BlazeBuilder[IO]] = {
     for {
       streamMetrics <- metrics.streamMetrics
       fromClient    <- metrics.signalFromClient
-      endpoints     <- endpoints.build(streamMetrics, fromClient, microservice, node)
+      endpoints     <- endpoints.build(streamMetrics, fromClient)
       server        <- server.getServer(host, port, endpoints)
     } yield server
   }
@@ -72,7 +68,7 @@ import org.http4s.dsl.io._
 @free trait Endpoints {
 
   def healthcheck: FS[HttpService[IO]]
-  def microservices(microservice: String, node: String): FS[HttpService[IO]]
+  def microservices: FS[HttpService[IO]]
   def protoMetric: FS[HttpService[IO]]
 
   def websocketMetrics(
@@ -81,14 +77,8 @@ import org.http4s.dsl.io._
 
   def build(
       streamMetrics: Stream[IO, WebSocketFrame],
-      fromClient: Sink[IO, WebSocketFrame],
-      microservice: String,
-      node: String): FS.Seq[HttpService[IO]] =
-    (
-      healthcheck,
-      protoMetric,
-      websocketMetrics(streamMetrics, fromClient),
-      microservices(microservice, node))
+      fromClient: Sink[IO, WebSocketFrame]): FS.Seq[HttpService[IO]] =
+    (healthcheck, protoMetric, websocketMetrics(streamMetrics, fromClient), microservices)
       .mapN(_ <+> _ <+> _ <+> _)
 }
 

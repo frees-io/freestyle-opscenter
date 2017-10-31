@@ -54,9 +54,9 @@ object implicits {
           case GET -> Root / "healthcheck" => Ok(s"Works fine.")
         }.pure[M]
 
-      def microservices(microservice: String, node: String): M[HttpService[IO]] =
+      def microservices: M[HttpService[IO]] =
         HttpService[IO] {
-          case GET -> Root / "microservices" => Ok(getMicroservices(microservice, node).toPB)
+          case GET -> Root / "microservices" => Ok(getMicroservices.toPB)
         }.pure[M]
 
       def websocketMetrics(
