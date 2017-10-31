@@ -21,7 +21,7 @@ import freestyle._
 import freestyle.rpc.protocol._
 import org.joda.time.DateTime
 
-object Models {
+object models {
 
   @message
   case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)

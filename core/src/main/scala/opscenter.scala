@@ -19,21 +19,11 @@ package opscenter
 
 import freestyle._
 import freestyle.config.ConfigM
+import org.http4s.implicits._
 import org.http4s.HttpService
 import org.http4s.server.blaze.BlazeBuilder
-import org.http4s.server.blaze._
-import org.http4s.implicits._
-import _root_.fs2.Stream
 import cats.effect.IO
 import cats.implicits._
-import _root_.fs2._
-import cats.syntax.semigroup._
-import org.http4s.websocket.WebsocketBits.WebSocketFrame
-import cats.effect._
-import cats.implicits._
-import org.http4s._
-import org.http4s.implicits._
-import org.http4s.dsl.io._
 
 // Modules
 @module trait OpscenterApp {
@@ -63,11 +53,13 @@ import org.http4s.dsl.io._
 }
 
 @free trait Endpoints {
-  def healthcheck: FS[HttpService[IO]]
 
   def protoModels: FS[HttpService[IO]]
-
+  def microservices: FS[HttpService[IO]]
+  def healthcheck: FS[HttpService[IO]]
   def streamMetrics: FS[HttpService[IO]]
 
-  def build: FS.Seq[HttpService[IO]] = (healthcheck, protoModels, streamMetrics).mapN(_ <+> _ <+> _)
+  def build: FS.Seq[HttpService[IO]] =
+    (healthcheck, protoModels, streamMetrics, microservices).mapN(_ <+> _ <+> _ <+> _)
+
 }

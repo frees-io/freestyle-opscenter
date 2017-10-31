@@ -19,19 +19,19 @@ package opscenter
 package runtime
 package endpoints
 
-import java.io.File
-
 import freestyle._
 import freestyle.implicits._
+import freestyle.metrics.models.{Metric, MetricsList}
+import freestyle.metrics.models.Metric.implicits._
+import freestyle.opscenter.services.microservices._
 import org.http4s.dsl.impl.Root
 import org.http4s.{HttpService, StaticFile}
 import org.http4s.server.websocket.WS
 import org.http4s.dsl.io._
 import pbdirect._
 import _root_.fs2.{Scheduler, Stream}
-import freestyle.metrics.Models.{Metric, MetricsList}
-import freestyle.metrics.Models.Metric.implicits._
 import _root_.fs2._
+import java.io.File
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -56,6 +56,11 @@ object implicits {
       def healthcheck: M[HttpService[IO]] =
         C.capture(HttpService[IO] {
           case GET -> Root / "healthcheck" => Ok(s"Works fine.")
+        })
+
+      def microservices: M[HttpService[IO]] =
+        C.capture(HttpService[IO] {
+          case GET -> Root / "microservices" => Ok(getMicroservices.toPB)
         })
 
       def streamMetrics: M[HttpService[IO]] =
