@@ -16,31 +16,17 @@
 
 package freestyle
 package opscenter
+package services
 
-import freestyle._
-import freestyle.rpc.protocol._
-import org.joda.time.DateTime
+import freestyle.opscenter.models.{Microservice, MicroserviceList}
 
-object models {
+object microservices {
 
-  @message
-  case class Metric(metric: String, microservice: String, node: String, value: Float, date: Long)
+  def getMicroservices: MicroserviceList = {
 
-  object Metric {
+    // TODO: Pending to implement with freestyle-cassandra
+    val microservices = Microservice("microservice-0", "node1")
 
-    object implicits {
-      implicit def fromLongToDateTime(l: Long): DateTime = new DateTime(l)
-      implicit def fromDateTimeToLong(d: DateTime): Long = d.getMillis
-    }
-
+    MicroserviceList(microservices :: Nil)
   }
-
-  @message
-  case class MetricsList(metrics: List[Metric])
-
-  @message
-  case class Microservice(name: String, node: String)
-
-  @message
-  case class MicroserviceList(microservices: List[Microservice])
 }

@@ -9,7 +9,7 @@ resolvers ++= Seq(
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "example")
+  .settings(name := "microservice-opscenter")
   .settings(moduleName := "root")
   .settings(scalaVersion := "2.12.3")
   .settings(noPublishSettings: _*)

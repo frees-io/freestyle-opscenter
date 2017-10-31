@@ -66,8 +66,9 @@ import org.http4s.dsl.io._
 }
 
 @free trait Endpoints {
-  def healthcheck: FS[HttpService[IO]]
 
+  def healthcheck: FS[HttpService[IO]]
+  def microservices: FS[HttpService[IO]]
   def protoMetric: FS[HttpService[IO]]
 
   def websocketMetrics(
@@ -77,7 +78,8 @@ import org.http4s.dsl.io._
   def build(
       streamMetrics: Stream[IO, WebSocketFrame],
       fromClient: Sink[IO, WebSocketFrame]): FS.Seq[HttpService[IO]] =
-    (healthcheck, protoMetric, websocketMetrics(streamMetrics, fromClient)).mapN(_ <+> _ <+> _)
+    (healthcheck, protoMetric, websocketMetrics(streamMetrics, fromClient), microservices)
+      .mapN(_ <+> _ <+> _ <+> _)
 }
 
 @free trait Metrics {

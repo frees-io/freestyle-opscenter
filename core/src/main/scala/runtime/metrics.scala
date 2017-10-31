@@ -22,8 +22,8 @@ package metrics
 import pbdirect._
 import cats.instances.list._
 import _root_.fs2.{Scheduler, Stream}
-import freestyle.opscenter.Models.{Metric, MetricsList}
-import freestyle.opscenter.Models.Metric.implicits._
+import freestyle.opscenter.models.{Metric, MetricsList}
+import freestyle.opscenter.models.Metric.implicits._
 import _root_.fs2._
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
