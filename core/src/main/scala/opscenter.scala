@@ -27,7 +27,6 @@ import cats.effect.IO
 import cats.implicits._
 import freestyle.metrics.Metrics
 
-// Modules
 @module trait OpscenterApp {
   val http: Http
   val services: Services
@@ -51,7 +50,6 @@ import freestyle.metrics.Metrics
   }
 }
 
-// Algebras
 @free trait Server {
   def getServer(host: String, port: Int, endpoints: HttpService[IO]): FS[BlazeBuilder[IO]]
 }

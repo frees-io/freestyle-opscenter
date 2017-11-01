@@ -44,10 +44,10 @@ object Main extends StreamApp[IO] {
       port = config.int("http.port").getOrElse(8080)
 
       // Example of metrics usage
-      maxMemory   <- app.metrics.default.maxMemory
-      usedMemory  <- app.metrics.default.usedMemory
-      freeMemory  <- app.metrics.default.freeMemory
-      totalMemory <- app.metrics.default.totalMemory
+      maxMemory   <- app.metrics.defaultMemory.max
+      usedMemory  <- app.metrics.defaultMemory.used
+      freeMemory  <- app.metrics.defaultMemory.free
+      totalMemory <- app.metrics.defaultMemory.total
 
       _ <- app.services.log.info(s"Max Memory: $maxMemory")
       _ <- app.services.log.info(s"Used Memory: $usedMemory")

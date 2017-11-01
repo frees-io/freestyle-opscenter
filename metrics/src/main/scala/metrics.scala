@@ -22,17 +22,15 @@ import freestyle.config.ConfigM
 import cats.effect.IO
 import cats.implicits._
 
-// Modules
 @module trait Metrics {
-  val default: Default
+  val defaultMemory: DefaultMemoryMetrics
 }
 
-// Algebras
-@free trait Default {
+@free trait DefaultMemoryMetrics {
 
-  def usedMemory: FS[Float]
-  def freeMemory: FS[Float]
-  def totalMemory: FS[Float]
-  def maxMemory: FS[Float]
+  def used: FS[Float]
+  def free: FS[Float]
+  def total: FS[Float]
+  def max: FS[Float]
 
 }

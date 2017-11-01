@@ -30,19 +30,18 @@ import scala.util.Random
 
 object implicits {
 
-  implicit def defaultHandler[M[_]](implicit C: Capture[M]): Default.Handler[M] =
-    new Default.Handler[M] {
+  implicit def defaultHandler[M[_]](implicit C: Capture[M]): DefaultMemoryMetrics.Handler[M] =
+    new DefaultMemoryMetrics.Handler[M] {
 
-      private val mb      = 1024 * 1024
       private val runtime = Runtime.getRuntime
 
-      def usedMemory: M[Float] = C.capture((runtime.totalMemory - runtime.freeMemory) / mb)
+      def used: M[Float] = C.capture((runtime.totalMemory - runtime.freeMemory))
 
-      def freeMemory: M[Float] = C.capture(runtime.freeMemory / mb)
+      def free: M[Float] = C.capture(runtime.freeMemory)
 
-      def totalMemory: M[Float] = C.capture(runtime.totalMemory / mb)
+      def total: M[Float] = C.capture(runtime.totalMemory)
 
-      def maxMemory: M[Float] = C.capture(runtime.maxMemory / mb)
+      def max: M[Float] = C.capture(runtime.maxMemory)
 
     }
 

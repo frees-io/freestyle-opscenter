@@ -44,7 +44,6 @@ lazy val core = project
 lazy val metrics = project
   .in(file("metrics"))
   .settings(moduleName := "frees-metrics")
-  .settings(scalaVersion := "2.12.3")
   .settings(noPublishSettings: _*)
   .settings(scalaMetaSettings: _*)
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
