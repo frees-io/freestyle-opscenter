@@ -99,7 +99,7 @@ object implicits {
       }
 
       private def metricsStream: Stream[IO, WebSocketFrame] =
-        Scheduler[IO](2)
+        Scheduler[IO](corePoolSize = 2)
           .flatMap(_.awakeEvery[IO](1.second))
           .map { d =>
             Binary(MetricsList(randomMetrics).toPB)
