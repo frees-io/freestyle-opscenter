@@ -4,7 +4,7 @@ Opscenter
 
 ## Generating the proto file
    
-`sbt core/protoGen`
+`sbt protoGen`
 
 The previous command will overwrite this proto file.
 

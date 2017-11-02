@@ -19,70 +19,51 @@ package opscenter
 
 import freestyle._
 import freestyle.config.ConfigM
+import freestyle.logging._
+import org.http4s.implicits._
 import org.http4s.HttpService
 import org.http4s.server.blaze.BlazeBuilder
-import org.http4s.server.blaze._
-import org.http4s.implicits._
-import _root_.fs2.Stream
 import cats.effect.IO
 import cats.implicits._
-import _root_.fs2._
-import cats.syntax.semigroup._
-import org.http4s.websocket.WebsocketBits.WebSocketFrame
-import cats.effect._
-import cats.implicits._
-import org.http4s._
-import org.http4s.implicits._
-import org.http4s.dsl.io._
+import freestyle.metrics.Metrics
 
-// Modules
 @module trait OpscenterApp {
   val http: Http
   val services: Services
+  val metrics: Metrics
 }
 
 @module trait Services {
   val config: ConfigM
+  val log: LoggingM
 }
 
 @module trait Http {
   val server: Server
   val endpoints: Endpoints
-  val metrics: Metrics
 
   def buildServer(host: String, port: Int): FS.Seq[BlazeBuilder[IO]] = {
     for {
-      streamMetrics <- metrics.streamMetrics
-      fromClient    <- metrics.signalFromClient
-      endpoints     <- endpoints.build(streamMetrics, fromClient)
-      server        <- server.getServer(host, port, endpoints)
+      endpoints <- endpoints.build
+      server    <- server.getServer(host, port, endpoints)
     } yield server
   }
 }
 
-// Algebras
 @free trait Server {
   def getServer(host: String, port: Int, endpoints: HttpService[IO]): FS[BlazeBuilder[IO]]
 }
 
 @free trait Endpoints {
 
-  def healthcheck: FS[HttpService[IO]]
+  def protoMetricModels: FS[HttpService[IO]]
+  def protoMicroservicesModels: FS[HttpService[IO]]
   def microservices: FS[HttpService[IO]]
-  def protoMetric: FS[HttpService[IO]]
+  def healthcheck: FS[HttpService[IO]]
+  def streamMetrics: FS[HttpService[IO]]
 
-  def websocketMetrics(
-      streamMetrics: Stream[IO, WebSocketFrame],
-      signalFromClient: Sink[IO, WebSocketFrame]): FS[HttpService[IO]]
+  def build: FS.Seq[HttpService[IO]] =
+    (healthcheck, protoMetricModels, protoMicroservicesModels, streamMetrics, microservices).mapN(
+      _ <+> _ <+> _ <+> _ <+> _)
 
-  def build(
-      streamMetrics: Stream[IO, WebSocketFrame],
-      fromClient: Sink[IO, WebSocketFrame]): FS.Seq[HttpService[IO]] =
-    (healthcheck, protoMetric, websocketMetrics(streamMetrics, fromClient), microservices)
-      .mapN(_ <+> _ <+> _ <+> _)
-}
-
-@free trait Metrics {
-  def streamMetrics: FS[Stream[IO, WebSocketFrame]]
-  def signalFromClient: FS[Sink[IO, WebSocketFrame]]
 }

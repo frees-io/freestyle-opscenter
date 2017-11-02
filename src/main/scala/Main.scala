@@ -17,9 +17,10 @@
 package freestyle
 
 import cats.Id
-import freestyle.opscenter.runtime.metrics.implicits._
 import freestyle.opscenter.runtime.server.implicits._
 import freestyle.opscenter.runtime.endpoints.implicits._
+import freestyle.metrics.runtime.default.implicits._
+import freestyle.loggingJVM.implicits._
 import freestyle._
 import freestyle.opscenter._
 import freestyle.implicits._
@@ -41,6 +42,18 @@ object Main extends StreamApp[IO] {
       config <- app.services.config.load
       host = config.string("http.host").getOrElse("localhost")
       port = config.int("http.port").getOrElse(8080)
+
+      // Example of metrics usage
+      maxMemory   <- app.metrics.defaultMemory.max
+      usedMemory  <- app.metrics.defaultMemory.used
+      freeMemory  <- app.metrics.defaultMemory.free
+      totalMemory <- app.metrics.defaultMemory.total
+
+      _ <- app.services.log.info(s"Max Memory: $maxMemory")
+      _ <- app.services.log.info(s"Used Memory: $usedMemory")
+      _ <- app.services.log.info(s"Free Memory: $freeMemory")
+      _ <- app.services.log.info(s"Total Memory: $totalMemory")
+
       server <- app.http.buildServer(host, port)
     } yield server
 

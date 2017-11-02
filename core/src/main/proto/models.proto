@@ -1,0 +1,18 @@
+// This file has been automatically generated for use by
+// sbt-frees-protogen plugin, from freestyle-rpc service definitions
+
+syntax = "proto3";
+
+
+
+message Microservice {
+   string name = 1;
+   string node = 2;
+}
+           
+message MicroserviceList {
+   repeated Microservice microservices = 1;
+}
+
+
+           

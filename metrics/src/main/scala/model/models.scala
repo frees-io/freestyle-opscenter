@@ -15,7 +15,7 @@
  */
 
 package freestyle
-package opscenter
+package metrics
 
 import freestyle._
 import freestyle.rpc.protocol._
@@ -37,10 +37,4 @@ object models {
 
   @message
   case class MetricsList(metrics: List[Metric])
-
-  @message
-  case class Microservice(name: String, node: String)
-
-  @message
-  case class MicroserviceList(microservices: List[Microservice])
 }
