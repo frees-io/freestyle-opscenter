@@ -25,8 +25,27 @@ object microservices {
   def getMicroservices: MicroserviceList = {
 
     // TODO: Pending to implement with freestyle-cassandra
-    val microservices = Microservice("microservice-0", "node1")
+    val node1 = Microservice("microservice-1", "node-1")
+    val node2 = Microservice("microservice-1", "node-2")
+    val node3 = Microservice("microservice-2", "node-1")
+    val node4 = Microservice("microservice-2", "node-2")
+    val node5 = Microservice("microservice-2", "node-3")
+    val node6 = Microservice("microservice-2", "node-4")
+    val node7 = Microservice("microservice-3", "node-1")
+    val node8 = Microservice("microservice-3", "node-2")
+    val node9 = Microservice("microservice-4", "node-1")
 
-    MicroserviceList(microservices :: Nil)
+    MicroserviceList(
+        node1 ::
+        node2 ::
+        node3 ::
+        node4 ::
+        node5 ::
+        node6 ::
+        node7 ::
+        node8 ::
+        node9 ::
+        Nil)
+
   }
 }
