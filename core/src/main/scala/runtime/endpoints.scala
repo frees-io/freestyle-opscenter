@@ -28,6 +28,7 @@ import org.http4s.dsl.impl.Root
 import org.http4s.{HttpService, StaticFile}
 import org.http4s.server.websocket.WS
 import org.http4s.dsl.io._
+import cats.instances.list._
 import pbdirect._
 import _root_.fs2.{Scheduler, Stream}
 import _root_.fs2._
