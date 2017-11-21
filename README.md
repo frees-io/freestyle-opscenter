@@ -13,8 +13,15 @@ The previous command will overwrite this proto file.
 As database, we need install Cassandra. We use this database to store the microservices, nodes and services which we are monitoring.
 These tables will be updated directly from each microservices. 
 
-Note: In the next iterations, we will create an image in Docker with all the environment to reproduce it easily.
+Run this command to initialize the database.
 
+`cqlsh -f scripts/cassandra-init.cql`
+
+Run this command to insert dummy data into the database.
+
+`cqlsh -f scripts/cassandra-values.cql`
+
+Note: In the next iterations, we will create an image in Docker with all the environment to reproduce it easily.
 
 [comment]: # (Start Copyright)
 # Copyright
