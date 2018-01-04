@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 47 Degrees, LLC. <http://www.47deg.com>
+ * Copyright 2017-2018 47 Degrees, LLC. <http://www.47deg.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,20 @@ import cats.Id
 import freestyle.opscenter.runtime.server.implicits._
 import freestyle.opscenter.runtime.endpoints.implicits._
 import freestyle.metrics.runtime.default.implicits._
-import freestyle.loggingJVM.implicits._
-import freestyle._
+import freestyle.free.loggingJVM.implicits._
+import freestyle.free._
 import freestyle.opscenter._
-import freestyle.implicits._
-import freestyle.config.implicits._
+import freestyle.free.implicits._
+import freestyle.free.config.implicits._
 import cats.implicits._
 import _root_.fs2.Stream
-import cats.effect.{IO}
+import cats.effect.IO
+import freestyle.free.config.ConfigM
+import freestyle.free.logging.LoggingM
+import freestyle.metrics.Metrics
 import org.http4s.server.blaze._
-import org.http4s.util.StreamApp
-import org.http4s.util.StreamApp.ExitCode
+import org.http4s.util._
+import fs2.StreamApp.ExitCode
 
 import scala.util.Try
 
@@ -59,7 +62,21 @@ object Main extends StreamApp[IO] {
 
   }
 
-  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
+  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {
+    /*
+    val http: Http
+    val services: Services
+    val metrics: Metrics
+     */
+
+    implicitly[FSHandler[ConfigM.Op, Try]]
+    implicitly[FSHandler[LoggingM.Op, Try]]
+    implicitly[FSHandler[Services.Op, Try]]
+    implicitly[FSHandler[Metrics.Op, Try]]
+    implicitly[FSHandler[Http.Op, Try]]
+
     bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.fail(e), _.serve)
+
+  }
 
 }
