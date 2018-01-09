@@ -62,21 +62,7 @@ object Main extends StreamApp[IO] {
 
   }
 
-  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {
-    /*
-    val http: Http
-    val services: Services
-    val metrics: Metrics
-     */
-
-    implicitly[FSHandler[ConfigM.Op, Try]]
-    implicitly[FSHandler[LoggingM.Op, Try]]
-    implicitly[FSHandler[Services.Op, Try]]
-    implicitly[FSHandler[Metrics.Op, Try]]
-    implicitly[FSHandler[Http.Op, Try]]
-
-    bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.fail(e), _.serve)
-
-  }
+  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
+    bootstrap[OpscenterApp.Op].interpret[Try].fold(e => Stream.raiseError(e), _.serve)
 
 }
