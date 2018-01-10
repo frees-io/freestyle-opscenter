@@ -25,11 +25,11 @@ lazy val core = project
   .settings(scalaVersion := "2.12.3")
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
     Seq(
-      %%("frees-core", "0.5.1"),
-      %%("frees-http4s", "0.5.1"),
-      %%("frees-config", "0.5.1"),
-      %%("frees-logging", "0.5.1"),
-      %%("frees-rpc", "0.6.1"),
+      %%("frees-core"),
+      %%("frees-http4s"),
+      %%("frees-config"),
+      %%("frees-logging"),
+      %%("frees-rpc"),
       %%("cats-effect"),
       %%("http4s-dsl"),
       %%("http4s-blaze-client"),
@@ -47,8 +47,8 @@ lazy val metrics = project
   .settings(scalaMetaSettings: _*)
   .settings(libraryDependencies ++= commonDeps ++ freestyleCoreDeps() ++
     Seq(
-      %%("frees-core", "0.5.1"),
-      %%("frees-rpc", "0.6.1"),
+      %%("frees-core"),
+      %%("frees-rpc"),
       %("joda-time")
     )
   )
