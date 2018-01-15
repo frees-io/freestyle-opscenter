@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 47 Degrees, LLC. <http://www.47deg.com>
+ * Copyright 2017-2018 47 Degrees, LLC. <http://www.47deg.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package opscenter
 package runtime
 package endpoints
 
-import freestyle._
-import freestyle.implicits._
+import freestyle.free._
+import freestyle.free.implicits._
 import freestyle.metrics.models.{Metric, MetricsList}
 import freestyle.metrics.models.Metric.implicits._
 import freestyle.opscenter.services.microservices._
@@ -33,12 +33,15 @@ import pbdirect._
 import _root_.fs2.{Scheduler, Stream}
 import _root_.fs2._
 import java.io.File
+
 import org.http4s.websocket.WebsocketBits.{Binary, Text}
 import org.http4s.websocket.WebsocketBits.WebSocketFrame
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import cats.effect.IO
 import scala.concurrent.duration._
 import org.joda.time.DateTime
+
 import scala.util.Random
 
 object implicits {
